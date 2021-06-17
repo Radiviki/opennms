@@ -1230,7 +1230,7 @@
       problematic pauses when starting MockSnmpAgent in unit tests.
     -->
     <argLineMemory>-Xmx1536m</argLineMemory>
-    <argLine>${argLineMemory} -Djava.security.egd=/dev/./urandom</argLine>
+    <argLine>${argLineMemory} -Djava.security.egd=/dev/./urandom --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
     <skipITs>true</skipITs>
 
     <!--
@@ -1398,8 +1398,8 @@
     <eclipselinkVersion>2.5.1</eclipselinkVersion>
     <elasticsearchNettyVersion>4.1.69.Final</elasticsearchNettyVersion>
     <elasticsearchTargetVersion>7.6.2</elasticsearchTargetVersion>
-    <felixBridgeVersion>4.0.4</felixBridgeVersion>
-    <felixProxyVersion>3.0.4</felixProxyVersion>
+    <felixBridgeVersion>4.1.6</felixBridgeVersion>
+    <felixProxyVersion>3.0.6</felixProxyVersion>
     <fopVersion>1.0</fopVersion>
     <freemarkerVersion>2.3.23</freemarkerVersion>
     <fstVersion>2.47</fstVersion>
