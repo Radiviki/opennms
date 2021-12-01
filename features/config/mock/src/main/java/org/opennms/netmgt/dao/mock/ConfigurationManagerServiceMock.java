@@ -117,6 +117,9 @@ public class ConfigurationManagerServiceMock implements ConfigurationManagerServ
         } else if ("wmi".equals(configName)) {
             def = XsdHelper.buildConfigDefinition("wmi", "wmi-config.xsd",
                     "wmi-config", ConfigurationManagerService.BASE_PATH);
+        } else if ("snmp".equals(configName)) {
+            def = XsdHelper.buildConfigDefinition("snmp", "snmp-config.xsd",
+                    "snmp-config", ConfigurationManagerService.BASE_PATH);
         }
         return Optional.ofNullable(def);
     }
