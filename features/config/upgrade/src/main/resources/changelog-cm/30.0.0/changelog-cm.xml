@@ -76,4 +76,11 @@
         </cm:changeSchema>
         <cm:importConfig schemaId="org.opennms.features.topology.app.icons.application" configId="default" filePath="org.opennms.features.topology.app.icons.application.cfg"/>
     </changeSet>
+
+    <changeSet author="uguggilam" id="1.0-register-schema-notifications">
+        <cm:registerSchema id="notifications"/>
+        <cm:importSchemaFromXsd id="notifications" xsdFileName="notifications.xsd" xsdFileHash="fbfede0d9b427097e03815572d0b9ed6afc64366b89f71798333e38101e6d2ca" rootElement="notifications"/>
+        <cm:importConfig schemaId="notifications" configId="default" filePath="notifications.xml"/>
+    </changeSet>
+
 </databaseChangeLog>
