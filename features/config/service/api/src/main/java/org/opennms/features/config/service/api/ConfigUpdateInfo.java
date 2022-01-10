@@ -66,4 +66,8 @@ public class ConfigUpdateInfo {
         return ((ConfigUpdateInfo) obj).getConfigName().equals(this.getConfigName())
                 && ((ConfigUpdateInfo) obj).getConfigId().equals(this.getConfigId());
     }
+
+    public String toString() {
+        return String.format("ConfigIdentifier(configName=%s, configId=%s)", this.configName, this.configId);
+    }
 }

@@ -73,7 +73,9 @@ public interface ConfigurationManagerService {
      * @param configObject (config object / JSONObject)
      */
     void registerConfiguration(String configName, String configId, JsonAsString configObject);
-
+    default void registerConfiguration(ConfigUpdateInfo configIdentifier, JsonAsString configObject) {
+        this.registerConfiguration(configIdentifier.getConfigName(), configIdentifier.getConfigId(), configObject);
+    }
     /**
      * remove configure from service
      *

@@ -28,6 +28,8 @@
 
 package org.opennms.features.config.osgi.cm;
 
+import static org.opennms.features.config.osgi.cm.CmIdentifierUtil.pidToCmIdentifier;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -40,6 +42,7 @@ import java.util.stream.Collectors;
 
 import org.apache.felix.cm.PersistenceManager;
 import org.opennms.features.config.osgi.del.MigratedServices;
+import org.opennms.features.config.service.api.ConfigUpdateInfo;
 import org.opennms.features.config.service.api.ConfigurationManagerService;
 import org.opennms.features.config.service.api.JsonAsString;
 import org.slf4j.Logger;
@@ -100,7 +103,9 @@ public class CmPersistenceManager implements PersistenceManager {
     public void store(String pid, Dictionary props) throws IOException {
         Optional<Dictionary<String, Object>> confFromConfigService = loadInternal(pid);
         if (confFromConfigService.isEmpty() || !equalsWithoutRevision(props, confFromConfigService.get())) {
-            configService.updateConfiguration(pid, CONFIG_ID, new JsonAsString(DictionaryUtil.writeToJson(props).toString()), false);
+            ConfigUpdateInfo identifier = pidToCmIdentifier(pid);
+            configService.updateConfiguration(identifier.getConfigName(), identifier.getConfigId(),
+                    new JsonAsString(DictionaryUtil.writeToJson(props).toString()), false);
         }
     }
 
