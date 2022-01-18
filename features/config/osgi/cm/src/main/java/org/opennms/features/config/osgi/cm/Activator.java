@@ -31,6 +31,7 @@ package org.opennms.features.config.osgi.cm;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.felix.cm.PersistenceManager;
 import org.opennms.features.config.osgi.del.MigratedServices;
@@ -60,20 +61,32 @@ public class Activator implements BundleActivator {
         final ConfigurationManagerService cm = findService(context, ConfigurationManagerService.class);
         CmPersistenceManager persistenceManager = new CmPersistenceManager(cm);
         registration = context.registerService(PersistenceManager.class, persistenceManager, config);
-        registerCallbacks(context, cm, persistenceManager);
+        registerCallbacks(context, cm);
 
         LOG.info("{} started.", CmPersistenceManager.class.getSimpleName());
     }
 
-    private void registerCallbacks(BundleContext context, ConfigurationManagerService cm, PersistenceManager persistenceManager) {
+    private void registerCallbacks(BundleContext context, ConfigurationManagerService cm) {
         final ConfigurationAdmin configurationAdmin = findService(context, ConfigurationAdmin.class);
-        for (String pid : MigratedServices.PIDS) {
+
+        // single instance services:
+        for (String pid : MigratedServices.PIDS_SINGLE_INSTANCE) {
             ConfigUpdateInfo key = new ConfigUpdateInfo(pid, "default");
-            cm.registerReloadConsumer(key, k -> updateConfig(configurationAdmin, persistenceManager, pid));
+            cm.registerReloadConsumer(key, k -> updateConfig(configurationAdmin, pid));
+        }
+
+        // multi instance services:
+        for (String configName : MigratedServices.PIDS_MULTI_INSTANCE) {
+            Set<String> configIds = cm.getConfigIds(configName);  // retrieve all instances
+            for(String configId : configIds) {
+                ConfigUpdateInfo key = new ConfigUpdateInfo(configName, configId);
+                String pid = configName + "-" + configId; // create combined pid (<basepid>-<instanceid>)
+                cm.registerReloadConsumer(key, k -> updateConfig(configurationAdmin, pid));
+            }
         }
     }
 
-    private void updateConfig(ConfigurationAdmin configurationAdmin, PersistenceManager persistenceManager, String pid) {
+    private void updateConfig(ConfigurationAdmin configurationAdmin, String pid) {
         try {
             configurationAdmin
                     .getConfiguration(pid)

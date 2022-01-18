@@ -72,24 +72,31 @@ class ConfigFileUtil {
 
     static Collection<Resource> findConfigFiles(String fileName) {
         Map<String, Resource> allConfigFiles = new HashMap<>();
+
+        // find config files in defaults
+        String resourcePattern = String.format("classpath*:/defaults/%s", fileName);
+        allConfigFiles.putAll(findFiles(resourcePattern));
+
+        // find config files in etc (might override default)
+        resourcePattern = String.format("file:%s/etc/%s", OPENNMS_HOME, fileName);
+        allConfigFiles.putAll(findFiles(resourcePattern));
+
+        return allConfigFiles.values();
+    }
+
+    static Map<String, Resource> findFiles(String resourcePattern) {
+        Map<String, Resource> configs = new HashMap<>();
         try {
-            // find config files in defaults
-            String resourcePattern = String.format("classpath*:/defaults/%s", fileName);
             Resource[] configFiles = new PathMatchingResourcePatternResolver().getResources(resourcePattern);
             for (Resource config : configFiles) {
-                allConfigFiles.put(config.getFilename(), config);
-            }
-
-            // find config files in etc (might override default)
-            resourcePattern = String.format("file:%s/etc/%s", OPENNMS_HOME, fileName);
-            configFiles = new PathMatchingResourcePatternResolver().getResources(resourcePattern);
-            for (Resource config : configFiles) {
-                allConfigFiles.put(config.getFilename(), config);
+                if (config.isReadable()) {
+                    configs.put(config.getFilename(), config);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return allConfigFiles.values();
+        return configs;
     }
 
     static void checkFileType(ValidationErrors validationErrors, Set<String> allowedExtension, String filePath) {

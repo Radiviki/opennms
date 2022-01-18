@@ -34,10 +34,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.felix.cm.PersistenceManager;
@@ -59,8 +61,6 @@ public class CmPersistenceManager implements PersistenceManager {
         String SERVICE_PID = "service.pid";
     }
 
-    private final static String CONFIG_ID = "default";
-
     private final ConfigurationManagerService configService;
 
     public CmPersistenceManager(final ConfigurationManagerService configService) {
@@ -69,16 +69,28 @@ public class CmPersistenceManager implements PersistenceManager {
 
     @Override
     public boolean exists(final String pid) {
-        return MigratedServices.PIDS.contains(pid)
+        return MigratedServices.isMigrated(pid)
                 && loadInternal(pid).isPresent();
     }
 
     @Override
     public Enumeration getDictionaries() {
-        List<Dictionary<String, Object>> dictionaries = MigratedServices.PIDS.stream()
+
+        Set<String> pids = new HashSet<>();
+        for(String configName : MigratedServices.PIDS_MULTI_INSTANCE) {
+            Set<String> configIds = this.configService.getConfigIds(configName);
+            configIds
+                    .stream()
+                    .map(id -> configName + "-" + id)
+                    .forEach(pids::add);
+        }
+        pids.addAll(MigratedServices.PIDS_SINGLE_INSTANCE);
+
+        List<Dictionary<String, Object>> dictionaries = pids.stream()
                 .map(this::loadInternal)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList());
+
         return Collections.enumeration(dictionaries);
     }
 
@@ -90,7 +102,8 @@ public class CmPersistenceManager implements PersistenceManager {
 
     private Optional<Dictionary<String, Object>> loadInternal(String pid) {
         Objects.requireNonNull(pid);
-        return configService.getJSONStrConfiguration(pid, CONFIG_ID).map(s -> {
+        ConfigUpdateInfo identifier = CmIdentifierUtil.pidToCmIdentifier(pid);
+        return configService.getJSONStrConfiguration(identifier).map(s -> {
             Dictionary d = DictionaryUtil.createFromJson(new JsonAsString(s));
             if (d.get(OsgiProperties.SERVICE_PID) == null) {
                 d.put(OsgiProperties.SERVICE_PID, pid); // make sure pid is set, otherwise we will run into a Nullpointer later

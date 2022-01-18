@@ -74,7 +74,7 @@ public class ImportConfigurationUtil {
             }
             configurationManagerService.registerConfiguration(configurationIdentifier, configObject);
             LOG.info("Configuration {} imported.", configurationIdentifier);
-            if(configResource.getFile().getAbsolutePath().endsWith("/etc/" + configResource.getFilename())) {
+            if(configResource.getURL().getFile().endsWith("/etc/" + configResource.getFilename())) {
                 Path etcFile = configResource.getFile().getAbsoluteFile().toPath();
                 // we imported a user defined config file => move to archive
                 Path archiveFile = Path.of(archivePath + "/" + etcFile.getFileName());

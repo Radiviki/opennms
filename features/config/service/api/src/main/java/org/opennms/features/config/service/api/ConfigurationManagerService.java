@@ -102,7 +102,9 @@ public interface ConfigurationManagerService {
      * @see #getJSONStrConfiguration(String, String)
      */
     Optional<String> getJSONStrConfiguration(String configName, String configId);
-
+    default Optional<String> getJSONStrConfiguration(ConfigUpdateInfo configIdentifier){
+        return getJSONStrConfiguration(configIdentifier.getConfigName(), configIdentifier.getConfigId());
+    }
     /**
      * get whole ConfigData by configName
      *
