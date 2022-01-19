@@ -2,7 +2,7 @@
  * This file is part of OpenNMS(R).
  *
  * Copyright (C) 2021 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 2021-2021 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2021 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -26,36 +26,8 @@
  *     http://www.opennms.com/
  *******************************************************************************/
 
-package org.opennms.features.config.osgi.cm;
+package org.opennms.features.config.service.api;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-import org.opennms.features.config.service.api.ConfigUpdateInfo;
-
-public class CmIdentifierUtilTest {
-
-    @Test
-    public void shouldParse() {
-        checkParse("", "", CmIdentifierUtil.CONFIG_ID);
-        checkParse("abc", "abc", CmIdentifierUtil.CONFIG_ID);
-        checkParse("abc-def", "abc", "def");
-    }
-
-    private void checkParse(String pid, String expectedName, String expectedId) {
-        ConfigUpdateInfo id = CmIdentifierUtil.pidToCmIdentifier(pid);
-        assertEquals(expectedName, id.getConfigName());
-        assertEquals(expectedId, id.getConfigId());
-    }
-
-    @Test
-    public void shouldCreatePid() {
-        checkCreate("abc", "def", "abc-def");
-        checkCreate("abc", "default", "abc");
-    }
-
-    private void checkCreate(String name, String id, String expectedPid) {
-        String pid = CmIdentifierUtil.cmIdentifierToPid(new ConfigUpdateInfo(name, id));
-        assertEquals(expectedPid, pid);
-    }
+public enum EventType {
+    CREATE, UPDATE, DELETE;
 }

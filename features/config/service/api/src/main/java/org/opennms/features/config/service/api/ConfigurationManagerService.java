@@ -31,7 +31,6 @@ package org.opennms.features.config.service.api;
 import org.json.JSONObject;
 import org.opennms.features.config.dao.api.ConfigData;
 import org.opennms.features.config.dao.api.ConfigDefinition;
-import org.opennms.features.config.exception.ValidationException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +61,12 @@ public interface ConfigurationManagerService {
 
     Optional<ConfigDefinition> getRegisteredConfigDefinition(String configName);
 
-    void registerReloadConsumer(ConfigUpdateInfo info, Consumer<ConfigUpdateInfo> consumer);
+    // TODO: Patrick remove
+    @Deprecated
+    default void registerEventHandler(ConfigUpdateInfo info, Consumer<ConfigUpdateInfo> consumer) {
+        registerEventHandler(EventType.UPDATE, info, consumer);
+    }
+    void registerEventHandler(EventType type, ConfigUpdateInfo info, Consumer<ConfigUpdateInfo> consumer);
 
     /**
      * register a new configuration by config object.

@@ -28,6 +28,8 @@
 
 package org.opennms.features.config.service.impl;
 
+import static org.opennms.features.config.service.api.EventType.UPDATE;
+
 import org.opennms.features.config.exception.ConfigNotFoundException;
 import org.opennms.features.config.exception.ValidationException;
 import org.opennms.features.config.service.api.ConfigUpdateInfo;
@@ -219,6 +221,6 @@ public abstract class AbstractCmJaxbConfigDao<E> {
      */
     public void addOnReloadedCallback(String configId, Consumer<ConfigUpdateInfo> callback) {
         Objects.requireNonNull(callback);
-        configurationManagerService.registerReloadConsumer(new ConfigUpdateInfo(this.getConfigName(), configId), callback);
+        configurationManagerService.registerEventHandler(UPDATE, new ConfigUpdateInfo(this.getConfigName(), configId), callback);
     }
 }

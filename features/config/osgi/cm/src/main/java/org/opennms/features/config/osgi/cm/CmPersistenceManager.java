@@ -29,6 +29,7 @@
 package org.opennms.features.config.osgi.cm;
 
 import static org.opennms.features.config.osgi.cm.CmIdentifierUtil.pidToCmIdentifier;
+import static org.osgi.service.cm.ConfigurationAdmin.SERVICE_FACTORYPID;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -107,6 +108,10 @@ public class CmPersistenceManager implements PersistenceManager {
             Dictionary d = DictionaryUtil.createFromJson(new JsonAsString(s));
             if (d.get(OsgiProperties.SERVICE_PID) == null) {
                 d.put(OsgiProperties.SERVICE_PID, pid); // make sure pid is set, otherwise we will run into a Nullpointer later
+            }
+            // set factoryPid for multi instance services
+            if (MigratedServices.PIDS_MULTI_INSTANCE.contains(MigratedServices.getBasePid(pid)) && d.get(SERVICE_FACTORYPID) == null) {
+                d.put(SERVICE_FACTORYPID, identifier.getConfigName());
             }
             return d;
         });

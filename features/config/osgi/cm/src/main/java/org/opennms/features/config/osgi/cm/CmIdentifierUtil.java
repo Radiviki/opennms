@@ -50,4 +50,14 @@ public class CmIdentifierUtil {
             }
             return new ConfigUpdateInfo(configName, configId);
     }
+
+    public static String cmIdentifierToPid(ConfigUpdateInfo identifier) {
+        Objects.requireNonNull(identifier);
+        StringBuilder b = new StringBuilder(identifier.getConfigName());
+        if(!CONFIG_ID.equals(identifier.getConfigId())) {
+            b.append("-")
+                    .append(identifier.getConfigId());
+        }
+        return b.toString();
+    }
 }

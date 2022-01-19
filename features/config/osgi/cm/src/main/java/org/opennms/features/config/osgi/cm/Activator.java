@@ -31,12 +31,12 @@ package org.opennms.features.config.osgi.cm;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Optional;
-import java.util.Set;
 
 import org.apache.felix.cm.PersistenceManager;
 import org.opennms.features.config.osgi.del.MigratedServices;
 import org.opennms.features.config.service.api.ConfigUpdateInfo;
 import org.opennms.features.config.service.api.ConfigurationManagerService;
+import org.opennms.features.config.service.api.EventType;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -72,25 +72,36 @@ public class Activator implements BundleActivator {
         // single instance services:
         for (String pid : MigratedServices.PIDS_SINGLE_INSTANCE) {
             ConfigUpdateInfo key = new ConfigUpdateInfo(pid, "default");
-            cm.registerReloadConsumer(key, k -> updateConfig(configurationAdmin, pid));
+            cm.registerEventHandler(EventType.UPDATE, key, k -> createOrUpdateConfig(configurationAdmin, k));
+            // CREATE and DELETE doesn't apply for single instance services
         }
 
         // multi instance services:
         for (String configName : MigratedServices.PIDS_MULTI_INSTANCE) {
-            Set<String> configIds = cm.getConfigIds(configName);  // retrieve all instances
-            for(String configId : configIds) {
-                ConfigUpdateInfo key = new ConfigUpdateInfo(configName, configId);
-                String pid = configName + "-" + configId; // create combined pid (<basepid>-<instanceid>)
-                cm.registerReloadConsumer(key, k -> updateConfig(configurationAdmin, pid));
-            }
+            ConfigUpdateInfo key = new ConfigUpdateInfo(configName, "*");
+            cm.registerEventHandler(EventType.CREATE, key, k -> createOrUpdateConfig(configurationAdmin, k));
+            cm.registerEventHandler(EventType.UPDATE, key, k -> createOrUpdateConfig(configurationAdmin, k));
+            cm.registerEventHandler(EventType.DELETE, key, k -> deleteConfig(configurationAdmin, k));
         }
     }
 
-    private void updateConfig(ConfigurationAdmin configurationAdmin, String pid) {
+    private void createOrUpdateConfig(ConfigurationAdmin configurationAdmin, ConfigUpdateInfo key) {
+        String pid = CmIdentifierUtil.cmIdentifierToPid(key);
         try {
             configurationAdmin
                     .getConfiguration(pid)
                     .update();
+        } catch (IOException e) {
+            LOG.error("Cannot load configuration for pid=" + pid, e);
+        }
+    }
+
+    private void deleteConfig(ConfigurationAdmin configurationAdmin, ConfigUpdateInfo key) {
+        String pid = CmIdentifierUtil.cmIdentifierToPid(key);
+        try {
+            configurationAdmin
+                    .getConfiguration(pid)
+                    .delete();
         } catch (IOException e) {
             LOG.error("Cannot load configuration for pid=" + pid, e);
         }

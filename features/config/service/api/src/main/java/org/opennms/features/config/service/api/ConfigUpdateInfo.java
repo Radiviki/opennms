@@ -30,6 +30,7 @@ package org.opennms.features.config.service.api;
 
 import java.util.Objects;
 
+// TODO: Patrick: rename
 public class ConfigUpdateInfo {
     private String configName;
     private String configId;
