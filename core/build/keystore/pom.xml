@@ -36,6 +36,7 @@
               <storepass>${webstart.storepass}</storepass>
               <alias>${webstart.keyalias}</alias>
               <keypass>${webstart.keypass}</keypass>
+              <keyalg>RSA</keyalg>
               <dname>cn=${webstart.dnameCn}</dname>
 
               <!-- I'm not sure if we need these extension attributes -->
