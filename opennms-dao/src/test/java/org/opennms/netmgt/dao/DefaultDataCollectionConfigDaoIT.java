@@ -203,7 +203,6 @@ public class DefaultDataCollectionConfigDaoIT {
         Assert.assertEquals(expectedCount, resourceTypesMap.size());
         Assert.assertTrue(resourceTypesMap.containsKey("frCircuitIfIndex")); // Used resource type
         Assert.assertTrue(resourceTypesMap.containsKey("wmiTcpipNetworkInterface")); // Unused resource type
-        Assert.assertTrue(resourceTypesMap.containsKey("xmpFilesys")); // Unused resource type
     }
 
     private void executeMibObjectsTest(DefaultDataCollectionConfigDao dao, String systemOid, int expectedCount) {

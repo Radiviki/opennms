@@ -599,18 +599,6 @@ public class ConfigTesterTest {
     }
 
     @Test
-    @Ignore
-    public void testXmpConfig() {
-        testConfigFile("xmp-config.xml");
-    }
-
-    @Test
-    @Ignore
-    public void testXmpDatacollectionConfig() {
-        testConfigFile("xmp-datacollection-config.xml");
-    }
-
-    @Test
     /**
      * FIXME: Configuration code is not in its own class.
      * 
