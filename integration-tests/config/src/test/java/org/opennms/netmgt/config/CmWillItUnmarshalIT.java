@@ -1,8 +1,8 @@
 /*******************************************************************************
  * This file is part of OpenNMS(R).
  *
- * Copyright (C) 2007-2021 The OpenNMS Group, Inc.
- * OpenNMS(R) is Copyright (C) 1999-2021 The OpenNMS Group, Inc.
+ * Copyright (C) 2021-2022 The OpenNMS Group, Inc.
+ * OpenNMS(R) is Copyright (C) 1999-2022 The OpenNMS Group, Inc.
  *
  * OpenNMS(R) is a registered trademark of The OpenNMS Group, Inc.
  *
@@ -44,6 +44,7 @@ import org.opennms.netmgt.config.discovery.DiscoveryConfiguration;
 import org.opennms.netmgt.config.enlinkd.EnlinkdConfiguration;
 import org.opennms.netmgt.config.jmx.JmxConfig;
 import org.opennms.netmgt.config.notifd.NotifdConfiguration;
+import org.opennms.netmgt.config.notifications.Notifications;
 import org.opennms.netmgt.config.provisiond.ProvisiondConfiguration;
 import org.opennms.netmgt.config.trapd.TrapdConfiguration;
 import org.opennms.netmgt.config.vmware.VmwareConfig;
@@ -116,6 +117,8 @@ public class CmWillItUnmarshalIT {
         addFile(Source.CLASSPATH, "/defaults/trapd-configuration.xml", TrapdConfiguration.class, "trapd-configuration.xsd", "trapd-configuration",true, null);
         // since notifd have default values, the checkFormat will never right.
         addFile(Source.CLASSPATH, "/defaults/notifd-configuration.xml", NotifdConfiguration.class,  "notifd-configuration.xsd", "notifd-configuration", false, null);
+        addFile(Source.CLASSPATH, "/defaults/notifications.xml", Notifications.class,  "notifications.xsd", "notifications", false, null);
+        addFile(Source.EXAMPLE, "notifications.xml", Notifications.class,  "notifications.xsd", "notifications", false, null);
     }
 
     /**
