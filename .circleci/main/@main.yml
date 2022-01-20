@@ -561,7 +561,9 @@ workflows:
           matrix:
             parameters:
               architecture: [linux/amd64,linux/arm64,linux/arm/v7]
-          context: "docker-content-trust"
+          context:
+            - "docker-content-trust"
+            - "Service Principal"
           requires:
             - horizon-deb-build
             - minion-deb-build
@@ -579,7 +581,9 @@ workflows:
                 - /^master-.*/
                 - /^release-.*/
       - minion-image-multi-arch:
-          context: "docker-content-trust"
+          context:
+            - docker-content-trust
+            - Service Principal
           requires:
             - minion-image-single-arch
           filters:
