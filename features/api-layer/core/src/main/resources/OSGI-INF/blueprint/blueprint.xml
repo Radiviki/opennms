@@ -387,5 +387,9 @@
     <argument ref="graphContainerCache" />
   </bean>
   <service ref="graphContainerCacheImpl" interface="org.opennms.integration.api.v1.graph.GraphContainerCache" />
+  <bean id="extensionRegistry" class="org.opennms.features.apilayer.extension.ExtensionRegistryImpl"/>
+  <reference-list interface="org.opennms.integration.api.v1.extension.OpenNMSExtensionFactory" availability="optional">
+    <reference-listener bind-method="onBind" unbind-method="onUnbind" ref="extensionRegistry"/>
+  </reference-list>
 
 </blueprint>
