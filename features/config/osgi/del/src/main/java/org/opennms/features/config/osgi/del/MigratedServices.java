@@ -52,27 +52,14 @@ public class MigratedServices {
             // ... or here
     );
 
-    final public static Set<String> PIDS = new HashSet<>();
-    static {
-        PIDS.addAll(PIDS_SINGLE_INSTANCE);
-        PIDS.addAll(PIDS_MULTI_INSTANCE);
-    }
-
     public static boolean isMigrated(final String pid) {
-        String basePid = getBasePid(pid);
-        return PIDS.contains(basePid);
+        Objects.requireNonNull(pid);
+        return PIDS_SINGLE_INSTANCE.contains(pid) || isMultiInstanceService(pid);
     }
 
-    /**
-     * Pids have the following form: <base pid>[-<configId>]
-     */
-    public static String getBasePid(String pid) {
+    public static boolean isMultiInstanceService(final String pid) {
         Objects.requireNonNull(pid);
-        int lastIndexOf = pid.lastIndexOf( "-" );
-        if(lastIndexOf > 0) {
-            return pid.substring( 0, lastIndexOf );
-        } else {
-            return pid;
-        }
+        return PIDS_MULTI_INSTANCE.stream()
+                .anyMatch(pid::startsWith);
     }
 }

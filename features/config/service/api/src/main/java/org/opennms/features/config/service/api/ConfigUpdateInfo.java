@@ -32,6 +32,11 @@ import java.util.Objects;
 
 // TODO: Patrick: rename
 public class ConfigUpdateInfo {
+
+    public static String DEFAULT_ID = "default";
+    public static String WILDCARD_ID = "*";
+
+
     private String configName;
     private String configId;
 
@@ -44,6 +49,10 @@ public class ConfigUpdateInfo {
     public ConfigUpdateInfo(String configName, String configId) {
         this.configName = Objects.requireNonNull(configName);
         this.configId = Objects.requireNonNull(configId);
+    }
+
+    public ConfigUpdateInfo(String configName) {
+        this(configName, DEFAULT_ID);
     }
 
     public String getConfigName() {

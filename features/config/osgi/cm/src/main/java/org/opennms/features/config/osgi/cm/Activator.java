@@ -28,15 +28,11 @@
 
 package org.opennms.features.config.osgi.cm;
 
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Optional;
 
 import org.apache.felix.cm.PersistenceManager;
-import org.opennms.features.config.osgi.del.MigratedServices;
-import org.opennms.features.config.service.api.ConfigUpdateInfo;
 import org.opennms.features.config.service.api.ConfigurationManagerService;
-import org.opennms.features.config.service.api.EventType;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -61,50 +57,10 @@ public class Activator implements BundleActivator {
         final ConfigurationManagerService cm = findService(context, ConfigurationManagerService.class);
         CmPersistenceManager persistenceManager = new CmPersistenceManager(cm);
         registration = context.registerService(PersistenceManager.class, persistenceManager, config);
-        registerCallbacks(context, cm);
+        final ConfigurationAdmin configurationAdmin = findService(context, ConfigurationAdmin.class);
+        new CallbackManager().registerCallbacks(configurationAdmin, cm, persistenceManager);
 
         LOG.info("{} started.", CmPersistenceManager.class.getSimpleName());
-    }
-
-    private void registerCallbacks(BundleContext context, ConfigurationManagerService cm) {
-        final ConfigurationAdmin configurationAdmin = findService(context, ConfigurationAdmin.class);
-
-        // single instance services:
-        for (String pid : MigratedServices.PIDS_SINGLE_INSTANCE) {
-            ConfigUpdateInfo key = new ConfigUpdateInfo(pid, "default");
-            cm.registerEventHandler(EventType.UPDATE, key, k -> createOrUpdateConfig(configurationAdmin, k));
-            // CREATE and DELETE doesn't apply for single instance services
-        }
-
-        // multi instance services:
-        for (String configName : MigratedServices.PIDS_MULTI_INSTANCE) {
-            ConfigUpdateInfo key = new ConfigUpdateInfo(configName, "*");
-            cm.registerEventHandler(EventType.CREATE, key, k -> createOrUpdateConfig(configurationAdmin, k));
-            cm.registerEventHandler(EventType.UPDATE, key, k -> createOrUpdateConfig(configurationAdmin, k));
-            cm.registerEventHandler(EventType.DELETE, key, k -> deleteConfig(configurationAdmin, k));
-        }
-    }
-
-    private void createOrUpdateConfig(ConfigurationAdmin configurationAdmin, ConfigUpdateInfo key) {
-        String pid = CmIdentifierUtil.cmIdentifierToPid(key);
-        try {
-            configurationAdmin
-                    .getConfiguration(pid)
-                    .update();
-        } catch (IOException e) {
-            LOG.error("Cannot load configuration for pid=" + pid, e);
-        }
-    }
-
-    private void deleteConfig(ConfigurationAdmin configurationAdmin, ConfigUpdateInfo key) {
-        String pid = CmIdentifierUtil.cmIdentifierToPid(key);
-        try {
-            configurationAdmin
-                    .getConfiguration(pid)
-                    .delete();
-        } catch (IOException e) {
-            LOG.error("Cannot load configuration for pid=" + pid, e);
-        }
     }
 
     private <T> T findService(BundleContext context, Class<T> clazz) {
