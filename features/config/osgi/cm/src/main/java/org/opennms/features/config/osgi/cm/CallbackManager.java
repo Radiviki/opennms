@@ -64,22 +64,21 @@ class CallbackManager {
         // multi instance services:
         for (String configName : MigratedServices.PIDS_MULTI_INSTANCE) {
             ConfigUpdateInfo key = new ConfigUpdateInfo(configName, WILDCARD_ID);
-            cm.registerEventHandler(EventType.CREATE, key, k -> createConfig(configurationAdmin, cm, cmPersistenceManager, k));
+            cm.registerEventHandler(EventType.CREATE, key, k -> createConfig(configurationAdmin, cmPersistenceManager, k));
             cm.registerEventHandler(EventType.UPDATE, key, k -> updateConfig(configurationAdmin, cmPersistenceManager, k));
             cm.registerEventHandler(EventType.DELETE, key, k -> deleteConfig(configurationAdmin, cmPersistenceManager, k));
         }
     }
 
-    private void createConfig(ConfigurationAdmin configurationAdmin, ConfigurationManagerService cm,
+    private void createConfig(ConfigurationAdmin configurationAdmin,
                               CmPersistenceManager cmPersistenceManager,
                               ConfigUpdateInfo key) {
         String cmPid = CmIdentifierUtil.cmIdentifierToPid(key);
-        Dictionary dic = DictionaryUtil.createFromJson(new JsonAsString(cm.getJSONStrConfiguration(key).get()));
 
         try {
             Configuration config = configurationAdmin.createFactoryConfiguration(key.getConfigName(), "?");
             cmPersistenceManager.setPidMapping(config.getPid(), cmPid);
-            config.update(dic);
+            config.update();
         } catch (IOException e) {
             LOG.error("Cannot create configuration for pid=" + cmPid, e);
         }
