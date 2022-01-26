@@ -391,5 +391,5 @@
   <reference-list interface="org.opennms.integration.api.v1.extension.OpenNMSExtensionFactory" availability="optional">
     <reference-listener bind-method="onBind" unbind-method="onUnbind" ref="extensionRegistry"/>
   </reference-list>
-
+  <service ref="extensionRegistry" interface="org.opennms.features.apilayer.extension.ExtensionRegistry" />
 </blueprint>
