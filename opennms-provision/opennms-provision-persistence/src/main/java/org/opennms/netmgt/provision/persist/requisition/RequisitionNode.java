@@ -542,8 +542,23 @@ public class RequisitionNode {
             throw new ValidationException("Node foreign ID (" + m_foreignId + ") contains invalid characters. ('/' is forbidden.)");
         }
         if (m_interfaces != null) {
-            for (final RequisitionInterface iface : m_interfaces) {
-                iface.validate();
+            // Special handling for interfaces. Don't abort parsing if an interface
+            // includes an invalid IP, just remove that interface from the node.
+            //     See <code>RequisitionInterface.validate()</code>
+            Iterator<RequisitionInterface> iter = m_interfaces.iterator();
+            while (iter.hasNext()) {
+                final RequisitionInterface iface = iter.next();
+                try {
+                    iface.validate();
+                } catch (ValidationException ve) {
+                    if (ve.getMessage().contains("ip-addr")) {
+                        // TODO Send some kind of indication that the interface was rejected.
+                        iter.remove();
+                    }
+                    else {
+                        throw ve; // throw any exceptions related to services
+                    }
+                }
             }
             // there can be only one primary interface per node
             if(m_interfaces.stream().filter(iface -> PrimaryType.PRIMARY == iface.m_snmpPrimary).count() > 1) {

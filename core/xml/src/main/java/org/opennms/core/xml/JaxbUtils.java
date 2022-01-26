@@ -89,15 +89,16 @@ public abstract class JaxbUtils {
     private static final Class<?>[] EMPTY_CLASS_LIST = new Class<?>[0];
     private static final Source[] EMPTY_SOURCE_LIST = new Source[0];
 
-    protected static final class LoggingValidationEventHandler implements ValidationEventHandler {
+    protected static final class LoggingIPValidationEventHandler implements ValidationEventHandler {
 
-        protected LoggingValidationEventHandler() {
+        protected LoggingIPValidationEventHandler() {
         }
 
         @Override
         public boolean handleEvent(final ValidationEvent event) {
             LOG.trace("event = {}", event, event.getLinkedException());
-            return false;
+            // Return true if the issue is related to the IP so parsing can continue
+            return (event.getLinkedException().getMessage().contains("IPAddress"));
         }
     }
 
@@ -271,7 +272,7 @@ public abstract class JaxbUtils {
             final XMLFilter filter = getXMLFilterForClass(clazz);
             final SAXSource source = new SAXSource(filter, inputSource);
 
-            um.setEventHandler(new LoggingValidationEventHandler());
+            um.setEventHandler(new LoggingIPValidationEventHandler());
 
             final JAXBElement<T> element = um.unmarshal(source, clazz);
             return element.getValue();
